@@ -5,7 +5,7 @@ class Server {
     this.app = express();
     this.port = process.env.PORT;
     this.homeRoute = '/';
-    this.apiRoute = '/api/destination';
+    this.apiRoute = '/api/trip';
 
 
     //Middlewares

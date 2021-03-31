@@ -7,7 +7,7 @@ const tripService = new TripService();
 
 const router = Router();
 
-
+//Get All Trips
 router.get('/', async ( req, res, next ) => {
     try {
         const getTrips = await tripService.getAllTrip();
@@ -22,12 +22,30 @@ router.get('/', async ( req, res, next ) => {
     }
 })
 
+//Get a Trip by id
+router.get('/:tripId', validationHandler({ tripId: tripIdSchema }), async ( req, res, next ) => {
+    //get id in params
+    const { tripId } = req.params;
+
+    try {
+        const tripById = await tripService.singleTrip( {tripId} )
+        res.status(200).json({
+            data: tripById,
+            msg: `Trip ${tripId} sucessfully get`
+        })
+    } catch ( err ) {
+        console.log( err )
+    }
+})
+
+//Post a Trip
 router.post("/", validationHandler(checkTripSchema), async ( req, res, next ) => {{
-    // Get data
+    // Get in body data
     const { body: data } = req;
     try {
-       const createTrip = await tripService.createTrip({ data });
-
+        //Create trip with tripService
+       const createTrip = await tripService.createTrip(  data  );
+        //send response in json
        res.status(201).json({
          data: createTrip,
          msg: 'Order Trip, sucessfully create'
@@ -38,11 +56,15 @@ router.post("/", validationHandler(checkTripSchema), async ( req, res, next ) =>
 
 }});
 
+//Modify a Trip by id
 router.put('/:tripId', validationHandler({ tripId: tripIdSchema }, 'params'), async ( req, res, next ) => {
+    //Get tripId and trip to update
     const { tripId } = req.params;
     const { body: trip } = req;
     try {
-        const tripUpdate = await tripService.updateTrip({ tripId, trip });
+        //Using tripService findByIdAndUpdate
+        const tripUpdate = await tripService.updateTrip( { tripId, trip } );
+        //send response
         res.status(200).json({
             data: tripUpdate,
             msg: 'Order Trip, sucessfully update'
@@ -52,13 +74,14 @@ router.put('/:tripId', validationHandler({ tripId: tripIdSchema }, 'params'), as
     }
 })
 
+//Delete a Trip by id
 router.delete('/:tripId', validationHandler({ tripId: tripIdSchema }, 'params'), async ( req, res, next) => {
     const { tripId } = req.params;
     try {
         const deleteTripId = await tripService.deleteTrip({ tripId });
 
         res.status(200).json({
-            data: deleteTripId,
+            idDelete: deleteTripId,
             msg: 'Order trip, sucessfully delete'
         })
     } catch ( err ) {
@@ -66,6 +89,9 @@ router.delete('/:tripId', validationHandler({ tripId: tripIdSchema }, 'params'),
     }
 
 })
+
+
+
 
 module.exports = router;
 
