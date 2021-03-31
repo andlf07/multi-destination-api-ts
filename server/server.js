@@ -5,7 +5,9 @@ class Server {
     this.app = express();
     this.port = process.env.PORT;
     this.homeRoute = '/';
-    this.apiRoute = '/api/trip';
+    this.apiTrip = '/api/trip';
+    this.apiUser = '/api/user';
+
 
 
     //Middlewares
@@ -29,7 +31,7 @@ class Server {
   routes() {
 
    this.app.use( this.homeRoute, require('../controllers/routes/homeRoute.routes') );
-   this.app.use( this.apiRoute, require('../controllers/routes/apiTrip.routes') );
+   this.app.use( this.apiTrip, require('../controllers/routes/apiTrip.routes') );
 
   }
 
