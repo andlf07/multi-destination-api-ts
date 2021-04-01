@@ -1,49 +1,48 @@
 const MongoDB = require("../lib/db");
-const TripSchema = require("../lib/models/tripModel");
 
-class TripService {
-  constructor() {
+class CrudService {
+  constructor( collection ) {
     this.db = new MongoDB();
-    this.model = require("../lib/models/tripModel");
+    this.model = collection;
   }
 
   //Getting all trips from <trip> collection
-  async getAllTrip() {
+  async getCollection() {
     // const allTrips = await this.db.getAll().then((result) => result);
-    const allTrips = await this.db.connect().then(() => this.model.find())
-    this.db.closeDB()
-    return allTrips;
+    const getCollection = await this.db.connect().then(() => this.model.find())
+    this.db.closeDB();
+    return getCollection;
   }
 
   //Creating a <trip> and inseting in collection
-  async createTrip(data) {
-    const createTrip = await this.db.connect().then(() => new this.model(data).save());
+  async createDocument(data) {
+    const createDocument = await this.db.connect().then(() => new this.model(data).save());
     this.db.closeDB()
-    return createTrip;
+    return createDocument;
   }
 
   //Updating a <trip>
-  async updateTrip({ tripId, trip }) {
+  async updateDocument({ docId, data }) {
     // const updateTripId = await this.db.update(this.collection, tripId, trip);
-    const updateTripId = await this.db.connect().then(() => this.model.findByIdAndUpdate( tripId, trip ));
+    const updateDocument = await this.db.connect().then(() => this.model.findByIdAndUpdate( docId, data ));
     this.db.closeDB();
-    return updateTripId;
+    return updateDocument;
   }
 
   //get single trip by id
 
-  async singleTrip({ tripId }) {
-    const tripById = await this.db.connect().then(() => this.model.findById( tripId )).then( result  => result );
+  async singleDocument({ docId }) {
+    const singleDocument = await this.db.connect().then(() => this.model.findById( docId )).then( result  => result );
     this.db.closeDB();
-    return tripById;
+    return singleDocument;
   }
 
   //Deleting one <trip>
-  async deleteTrip({ tripId }) {
-    const deleteTripId = await this.db.connect().then(() => this.model.findByIdAndDelete( tripId ).then(result => result.id));
+  async deleteDocument({ docId }) {
+    const deleteDocument = await this.db.connect().then(() => this.model.findByIdAndDelete( docId ).then(result => result.id));
     this.db.closeDB();
-    return deleteTripId;
+    return deleteDocument;
   }
 }
 
-module.exports = TripService;
+module.exports = CrudService;

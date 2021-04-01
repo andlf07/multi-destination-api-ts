@@ -1,16 +1,17 @@
 const { Router } = require("express");
 const validationHandler = require('../../helpers/validation/validationHandler');
 const { checkTripSchema, tripIdSchema } = require("../../helpers/validation/checkTripSchema");
-const TripService = require("../../services/TripService");
+const CrudService = require("../../services/TripService");
+const tripModel = require('../../lib/models/tripModel')
 
-const tripService = new TripService();
+const crudService = new CrudService(tripModel);
 
 const router = Router();
 
 //Get All Trips
 router.get('/', async ( req, res, next ) => {
     try {
-        const getTrips = await tripService.getAllTrip();
+        const getTrips = await crudService.getCollection();
 
         res.status(200).json({
             data: getTrips,
@@ -28,7 +29,7 @@ router.get('/:tripId', validationHandler({ tripId: tripIdSchema }), async ( req,
     const { tripId } = req.params;
 
     try {
-        const tripById = await tripService.singleTrip( {tripId} )
+        const tripById = await crudService.singleDocument( {tripId} )
         res.status(200).json({
             data: tripById,
             msg: `Trip ${tripId} sucessfully get`
@@ -44,7 +45,7 @@ router.post("/", validationHandler(checkTripSchema), async ( req, res, next ) =>
     const { body: data } = req;
     try {
         //Create trip with tripService
-       const createTrip = await tripService.createTrip(  data  );
+       const createTrip = await crudService.createDocument(  data  );
         //send response in json
        res.status(201).json({
          data: createTrip,
@@ -63,7 +64,7 @@ router.put('/:tripId', validationHandler({ tripId: tripIdSchema }, 'params'), as
     const { body: trip } = req;
     try {
         //Using tripService findByIdAndUpdate
-        const tripUpdate = await tripService.updateTrip( { tripId, trip } );
+        const tripUpdate = await crudService.updateDocument( { tripId, trip } );
         //send response
         res.status(200).json({
             data: tripUpdate,
@@ -78,7 +79,7 @@ router.put('/:tripId', validationHandler({ tripId: tripIdSchema }, 'params'), as
 router.delete('/:tripId', validationHandler({ tripId: tripIdSchema }, 'params'), async ( req, res, next) => {
     const { tripId } = req.params;
     try {
-        const deleteTripId = await tripService.deleteTrip({ tripId });
+        const deleteTripId = await crudService.deleteDocument({ tripId });
 
         res.status(200).json({
             idDelete: deleteTripId,
