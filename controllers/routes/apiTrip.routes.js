@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const validationHandler = require('../../helpers/validation/validationHandler');
 const { checkTripSchema, tripIdSchema } = require("../../helpers/validation/checkTripSchema");
-const CrudService = require("../../services/TripService");
+const CrudService = require("../../services/crudService");
 const tripModel = require('../../lib/models/tripModel')
 
 const crudService = new CrudService(tripModel);
@@ -29,13 +29,13 @@ router.get('/:tripId', validationHandler({ tripId: tripIdSchema }), async ( req,
     const { tripId } = req.params;
 
     try {
-        const tripById = await crudService.singleDocument( {tripId} )
+        const tripById = await crudService.singleDocument( tripId )
         res.status(200).json({
             data: tripById,
             msg: `Trip ${tripId} sucessfully get`
         })
     } catch ( err ) {
-        console.log( err )
+        next( err )
     }
 })
 
@@ -63,8 +63,8 @@ router.put('/:tripId', validationHandler({ tripId: tripIdSchema }, 'params'), as
     const { tripId } = req.params;
     const { body: trip } = req;
     try {
-        //Using tripService findByIdAndUpdate
-        const tripUpdate = await crudService.updateDocument( { tripId, trip } );
+        //Using crudService findByIdAndUpdate
+        const tripUpdate = await crudService.updateDocument(  tripId, trip  );
         //send response
         res.status(200).json({
             data: tripUpdate,
@@ -79,7 +79,7 @@ router.put('/:tripId', validationHandler({ tripId: tripIdSchema }, 'params'), as
 router.delete('/:tripId', validationHandler({ tripId: tripIdSchema }, 'params'), async ( req, res, next) => {
     const { tripId } = req.params;
     try {
-        const deleteTripId = await crudService.deleteDocument({ tripId });
+        const deleteTripId = await crudService.deleteDocument( tripId );
 
         res.status(200).json({
             idDelete: deleteTripId,

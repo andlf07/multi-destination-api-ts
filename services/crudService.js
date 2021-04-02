@@ -13,6 +13,13 @@ class CrudService {
     this.db.closeDB();
     return getCollection;
   }
+  //get single trip by id
+
+  async singleDocument( docId ) {
+    const singleDocument = await this.db.connect().then(() => this.model.findById( docId ));
+    this.db.closeDB();
+    return singleDocument;
+  }
 
   //Creating a <trip> and inseting in collection
   async createDocument(data) {
@@ -22,23 +29,16 @@ class CrudService {
   }
 
   //Updating a <trip>
-  async updateDocument({ docId, data }) {
+  async updateDocument(  docId, data  ) {
     // const updateTripId = await this.db.update(this.collection, tripId, trip);
-    const updateDocument = await this.db.connect().then(() => this.model.findByIdAndUpdate( docId, data ));
+    const updateDocument = await this.db.connect().then(() => this.model.findByIdAndUpdate( docId, data, {new: true} ));
     this.db.closeDB();
     return updateDocument;
   }
 
-  //get single trip by id
-
-  async singleDocument({ docId }) {
-    const singleDocument = await this.db.connect().then(() => this.model.findById( docId )).then( result  => result );
-    this.db.closeDB();
-    return singleDocument;
-  }
 
   //Deleting one <trip>
-  async deleteDocument({ docId }) {
+  async deleteDocument(  docId  ) {
     const deleteDocument = await this.db.connect().then(() => this.model.findByIdAndDelete( docId ).then(result => result.id));
     this.db.closeDB();
     return deleteDocument;

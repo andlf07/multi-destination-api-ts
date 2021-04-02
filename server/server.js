@@ -4,11 +4,9 @@ class Server {
   constructor() {
     this.app = express();
     this.port = process.env.PORT;
-    this.homeRoute = '/';
-    this.apiTrip = '/api/trip';
-    this.apiUser = '/api/user';
-
-
+    this.homeRoute = "/";
+    this.apiTrip = "/api/trip";
+    this.apiUser = "/api/user";
 
     //Middlewares
     this.middlewares();
@@ -29,10 +27,12 @@ class Server {
   }
 
   routes() {
-
-   this.app.use( this.homeRoute, require('../controllers/routes/homeRoute.routes') );
-   this.app.use( this.apiTrip, require('../controllers/routes/apiTrip.routes') );
-
+    this.app.use(this.apiUser, require("../controllers/routes/apiUser.routes"));
+    this.app.use(
+      this.homeRoute,
+      require("../controllers/routes/homeRoute.routes")
+    );
+    this.app.use(this.apiTrip, require("../controllers/routes/apiTrip.routes"));
   }
 
   listenPort() {
