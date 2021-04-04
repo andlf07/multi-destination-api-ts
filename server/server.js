@@ -7,6 +7,7 @@ class Server {
     this.homeRoute = "/";
     this.apiTrip = "/api/trip";
     this.apiUser = "/api/user";
+    this.apiAuthUser = '/api/auth'
 
     //Middlewares
     this.middlewares();
@@ -27,6 +28,7 @@ class Server {
   }
 
   routes() {
+    this.app.use(this.apiAuthUser, require("../controllers/routes/apiAuthUser.routes"));
     this.app.use(this.apiUser, require("../controllers/routes/apiUser.routes"));
     this.app.use(
       this.homeRoute,
