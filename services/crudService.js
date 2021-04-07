@@ -1,47 +1,75 @@
 const MongoDB = require("../lib/db");
 
 class CrudService {
-  constructor( collection ) {
+  constructor(collection) {
     this.db = new MongoDB();
     this.model = collection;
   }
 
-  //Getting all trips from <trip> collection
+  //Get all collection from DB
   async getCollection() {
-    // const allTrips = await this.db.getAll().then((result) => result);
-    const getCollection = await this.db.connect().then(() => this.model.find())
+    const getCollection = await this.db.connect().then(() => this.model.find());
     this.db.closeDB();
     return getCollection;
   }
-  //get single trip by id
 
-  async singleDocument( docId ) {
-    const singleDocument = await this.db.connect().then(() => this.model.findById( docId ));
+  //get singleDcoumento from collection = this.collection
+  async singleDocument(docId) {
+    const singleDocument = await this.db
+      .connect()
+      .then(() => this.model.findById(docId));
     this.db.closeDB();
     return singleDocument;
   }
 
-  //Creating a <trip> and inseting in collection
+  //Creating a document and inseting in collection
   async createDocument(data) {
-    const createDocument = await this.db.connect().then(() => new this.model(data).save());
-    this.db.closeDB()
+    const createDocument = await this.db
+      .connect()
+      .then(() => new this.model(data).save());
+    this.db.closeDB();
     return createDocument;
   }
 
-  //Updating a <trip>
-  async updateDocument(  docId, data  ) {
-    // const updateTripId = await this.db.update(this.collection, tripId, trip);
-    const updateDocument = await this.db.connect().then(() => this.model.findByIdAndUpdate( docId, data, {new: true} ));
+  //Updating document
+  async updateDocument(docId, data) {
+    const updateDocument = await this.db
+      .connect()
+      .then(() => this.model.findByIdAndUpdate(docId, data, { new: true }));
     this.db.closeDB();
     return updateDocument;
   }
 
-
-  //Deleting one <trip>
-  async deleteDocument(  docId  ) {
-    const deleteDocument = await this.db.connect().then(() => this.model.findByIdAndDelete( docId ).then(result => result.id));
+  //Deleting one document
+  async deleteDocument(docId) {
+    const deleteDocument = await this.db
+      .connect()
+      .then(() => this.model.findByIdAndDelete(docId))
+      .then((result) => result);
     this.db.closeDB();
     return deleteDocument;
+  }
+
+  async createSubDoc( docId, subDoc ) {
+    this.db.connect();
+    const getDocument = await this.model.findById(docId).then((result) => {
+
+      result.trips.push(subDoc);
+      result.save();
+      return result
+    })
+    this.db.closeDB;
+
+    return getDocument
+  }
+
+  async getSingleSubDoc( docId, subDocId ) {
+    this.db.connect();
+    console.log( docId, subDocId)
+    const getSingleDoc = await this.model.findById( docId ).then(result => result.trips.id( subDocId ));
+    this.closeDB;
+    return getSingleDoc;
+
   }
 }
 
