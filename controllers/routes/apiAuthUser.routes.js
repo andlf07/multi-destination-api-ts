@@ -19,14 +19,8 @@ router.post(
     try {
       const login = await loginService.login(email, password);
 
-      if (login == null) {
-        return res.status(400).json({
-          msg: "user y/o password are incorrect",
-        });
-      }
-
       //Generar token
-      const genToken = await signToken(login.id);
+      const genToken = await signToken(login.id, login.userType);
 
       res.status(200).json({
         data: login,

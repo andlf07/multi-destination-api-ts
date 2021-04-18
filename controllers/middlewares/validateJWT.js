@@ -5,8 +5,8 @@ const jwt = require('jsonwebtoken');
 const validateJWT = ( req = request, res = response, next ) => {
 
    const token = req.get('authorization');
-   // const token = 242424
 
+   //If token is wrong
    if ( !token ) {
       return res.status(401).json({
          msg: 'Unauthorized please login'
@@ -14,9 +14,13 @@ const validateJWT = ( req = request, res = response, next ) => {
    }
 
    try {
-      const { id } = jwt.verify( token, process.env.JSONTOKEN_KEY );
 
+      //get id in JWT
+      const { id, userType } = jwt.verify( token, process.env.JSONTOKEN_KEY );
+
+      //send id and userType in request object
       req.id = id;
+      req.userType = userType;
       next();
 
    } catch (error) {

@@ -1,149 +1,126 @@
 const { Router } = require("express");
-const validationHandler = require('../../helpers/validation/validationHandler');
-const { checkTripSchema, tripIdSchema } = require("../../helpers/validation/checkTripSchema");
-const CrudService = require("../../services/crudService");
+const validationHandler = require("../../helpers/validation/validationHandler");
+const {
+  checkTripSchema,
+  tripIdSchema,
+  checkPatchTripSchema,
+} = require("../../helpers/validation/checkTripSchema");
 const TripService = require("../../services/tripService");
-const tripModel = require('../../lib/models/tripModel');
-const userModel = require("../../lib/models/userModel");
 const validateJWT = require("../middlewares/validateJWT");
+const { object } = require("joi");
 
-const crudService = new CrudService(userModel);
 const tripService = new TripService();
-
-
 
 const router = Router();
 
 //Get All Trips of User
-router.get('/', validateJWT, async ( req, res, next ) => {
-    try {
-        const { id } = req
-        console.log(id)
-        const getTrips = await crudService.singleDocument( id );
+router.get("/", validateJWT, async (req, res, next) => {
+  try {
+    //get id from request in JWT
+    const { id } = req;
+    //get alltrips
+    const getTrips = await tripService.getAllTrips(id);
 
-        if(!getTrips) {
-            return res.status(400).json({
-                error: 'no exist trips in your list'
-            })
-        }
-
-        res.status(200).json({
-            data: getTrips,
-            msg: 'All trips, sucessfully get'
-        })
-
-    } catch ( err ) {
-        next( err )
-    }
-})
+    //response
+    res.status(200).json(getTrips);
+  } catch (err) {
+    next(err);
+  }
+});
 
 //Get a Trip by id
-router.get('/:tripId', [
-    validateJWT,
-    validationHandler({ tripId: tripIdSchema })
-], async ( req, res, next ) => {
-    //get id in params
+router.get(
+  "/:tripId",
+  [validateJWT, validationHandler({ tripId: tripIdSchema })],
+  async (req, res, next) => {
+    //get trip id in params
     const { tripId } = req.params;
-    //get id user in JWT
-    const { id } = req;
 
     try {
-        const tripById = await tripService.getSingleTrip( id, tripId )
-        console.log(tripById)
-        if(!tripById) {
-            return res.status(400).json({
-                error: 'trip do not exist'
-            })
-        }
-        res.status(200).json({
-            data: tripById,
-            msg: `Trip ${tripId} sucessfully get`
-        })
-    } catch ( err ) {
-        next( err )
+      //get single trip(subDoc) from db
+      const tripById = await tripService.getSingleTrip(tripId);
+      console.log(tripById);
+
+      //send response
+      res.status(200).json(tripById);
+    } catch (err) {
+      next(err);
     }
-})
+  }
+);
 
 //Post a Trip
-router.post("/", [
-    validateJWT,
-    validationHandler(checkTripSchema),
-],async ( req, res, next ) => {{
-    // Get in body data
-    const { body: data } = req;
-    const { id } = req
-    console.log(id)
-    try {
-        //Create trip in user trips
-        const createTrip = await tripService.createTrip( id, data )
-        //send response in json
-       res.status(201).json({
-         data: createTrip,
-         msg: 'Order Trip, sucessfully create'
-       });
-    } catch( err ) {
-       next( err );
-    }
+router.post(
+  "/",
+  [validateJWT, validationHandler(checkTripSchema)],
+  async (req, res, next) => {
+    {
+      // Get data in body
+      const { body: data } = req;
+      //get id user in JWT
+      const { id } = req;
 
-}});
+      data.user = id;
+
+      // const { street, comuna, region, city, ...rest } = data
+
+
+      try {
+        //Create trip in User trips
+        const createTrip = await tripService.createTrip(id, data);
+        //all is ok
+        res.status(201).json(createTrip);
+      } catch (err) {
+        next(err);
+      }
+    }
+  }
+);
 
 //Modify a Trip by id
-router.put('/:tripId', [
+router.patch(
+  "/:tripId",
+  [
     validateJWT,
-    validationHandler({ tripId: tripIdSchema }, 'params')
-], async ( req, res, next ) => {
+    validationHandler({ tripId: tripIdSchema }, "params"),
+    validationHandler(checkPatchTripSchema),
+  ],
+  async (req, res, next) => {
     //Get tripId and trip to update
     const { tripId } = req.params;
-    const { body: trip, id: userId } = req;
+    // trip = data to update
+    const { body: data } = req;
     try {
-        //Using crudService findByIdAndUpdate
-        const tripUpdate = await tripService.updateTrip(  userId, tripId, trip  );
-        console.log(tripUpdate)
+      //Send data to modify
+      const tripUpdate = await tripService.updateTrip(tripId, data);
 
-        if (!tripUpdate) {
-            return res.status(400).json({
-                error: 'trip do not exist'
-            })
-        }
-
-        //send response
-        res.status(200).json({
-            data: tripUpdate,
-            msg: 'Order Trip, sucessfully update'
-        })
+      //all is ok
+      res.status(200).json(tripUpdate);
     } catch (err) {
-        next( err )
+      next(err);
     }
-})
+  }
+);
 
 //Delete a Trip by id
-router.delete('/:tripId', [
-    validateJWT,
-    validationHandler({ tripId: tripIdSchema }, 'params')
-], async ( req, res, next) => {
+router.delete(
+  "/:tripId",
+  [validateJWT, validationHandler({ tripId: tripIdSchema }, "params")],
+  async (req, res, next) => {
+    //get trip id in request
     const { tripId } = req.params;
+    //get id = UserId from request
     const { id } = req;
     try {
-        const deleteTripId = await tripService.deleteTrip( id, tripId )
-        console.log(deleteTripId)
+      //Delete from db
+      const deleteTripId = await tripService.deleteTrip(id, tripId);
 
-        if ( !deleteTripId ) {
-            return res.status(400).json({
-                error: 'trip do not exist'
-            })
-        }
-        res.status(200).json({
-            data: deleteTripId,
-            msg: 'Order trip, sucessfully delete'
-        })
-    } catch ( err ) {
-        next( err );
+      //send response
+      res.status(200).json(deleteTripId);
+    } catch (err) {
+      next(err);
     }
-
-})
-
-
-
+  }
+);
 
 module.exports = router;
-
