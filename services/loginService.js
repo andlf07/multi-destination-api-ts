@@ -1,4 +1,3 @@
-const bcrytp = require("bcrypt");
 const MongoDB = require("../lib/db");
 
 class LoginService {
@@ -12,20 +11,6 @@ class LoginService {
     const user = await this.db
       .connect()
       .then(() => this.model.findOne({ email }));
-
-    if (!user)
-      return {
-        error: "user y/o password incorrect",
-      };
-    //Validate password
-    const validPassword = await bcrytp
-      .compare(password, user.password)
-      .then((result) => result);
-
-    if (!validPassword)
-      return {
-        error: "user y/o password incorrect",
-      };
 
     this.db.closeDB();
     return user;

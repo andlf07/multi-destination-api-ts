@@ -13,14 +13,7 @@ class TripService {
     const getTrips = await this.tripModel.find({ user: userId });
     this.db.closeDB();
 
-    if(!getTrips) return {
-      error: 'User doest not exist'
-    }
-
-    return {
-      data: getTrips,
-      msg: 'All trips, sucessfully get'
-    };
+    return getTrips;
   }
 
   //Get single trip
@@ -29,15 +22,7 @@ class TripService {
     const getSingleDoc = await this.tripModel.findById(tripId);
     this.db.closeDB();
 
-    if(!getSingleDoc) return {
-      error: 'User doest not exist'
-    }
-
-
-    return {
-      data: getSingleDoc,
-      msg: `Trip ${tripId}, sucessfully get`
-    };
+    return getSingleDoc;
   }
 
   //Create trip in User
@@ -50,10 +35,7 @@ class TripService {
     await getDocument.save();
     this.db.closeDB();
 
-    return {
-      data: saveTrip,
-      msg: 'Order successfully create'
-    };
+    return saveTrip;
   }
 
   //Update trip need userId = user, tripId = trip to modify, data = data to modify
@@ -61,16 +43,8 @@ class TripService {
     this.db.connect();
     const updateTrip = await this.tripModel.findOneAndUpdate({_id: tripId}, data, { new: true });
     this.db.closeDB();
-    console.log(updateTrip)
-    //if trip doest not exist
-    if (!updateTrip) return {
-      error: 'User doest not exist'
-    }
 
-    return {
-        data: updateTrip,
-        msg: "Order Trip, sucessfully update"
-    };
+    return updateTrip;
   }
 
   //delete trip by id
@@ -85,15 +59,9 @@ class TripService {
     await deleteInUser.save();
     this.db.closeDB();
 
-    //if doest not exist
-    if (!deleteTrip) return {
-      error: 'User doest not exist'
-    }
 
-    return {
-      data: deleteTrip,
-      msg: "Order trip, sucessfully delete",
-    };
+
+    return deleteTrip;
   }
 }
 

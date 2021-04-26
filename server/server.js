@@ -1,5 +1,9 @@
 const express = require("express");
 const cors = require("cors");
+const user = require("../routes/user.routes");
+const trips = require("../routes/trips.routes");
+const routeMaker = require("../routes/makeRoutes.routes");
+const authUser = require('../routes/auth.routes')
 class Server {
   constructor() {
     this.app = express();
@@ -7,8 +11,8 @@ class Server {
     this.homeRoute = "/";
     this.apiTrip = "/api/trip";
     this.apiUser = "/api/user";
-    this.apiAuthUser = '/api/auth'
-    this.apiMakeRoutes = '/api/routes'
+    this.apiAuthUser = "/api/auth";
+    this.apiMakeRoutes = "/api/routes";
 
     //Middlewares
     this.middlewares();
@@ -21,22 +25,19 @@ class Server {
     //CORS
     this.app.use(cors());
 
-    //Lectura y parseo del body
+    //read and bodyparser
     this.app.use(express.json());
 
-    //Direcctorio publico
-    this.app.use(express.static("public"));
+    //public directorio
+    // this.app.use(express.static("public"));
   }
 
   routes() {
-    this.app.use(this.apiAuthUser, require("../controllers/routes/apiAuthUser.routes"));
-    this.app.use(this.apiUser, require("../controllers/routes/apiUser.routes"));
-    this.app.use(
-      this.homeRoute,
-      require("../controllers/routes/homeRoute.routes")
-    );
-    this.app.use(this.apiMakeRoutes, require('../controllers/routes/apiRoutes.routes'))
-    this.app.use(this.apiTrip, require("../controllers/routes/apiTrip.routes"));
+    this.app.use(this.apiAuthUser, authUser);
+    this.app.use(this.apiUser, user);
+    this.app.use(this.homeRoute, require("../routes/homeRoute.routes"));
+    this.app.use(this.apiMakeRoutes, routeMaker);
+    this.app.use(this.apiTrip, trips);
   }
 
   listenPort() {

@@ -13,10 +13,8 @@ class UserService {
     this.db.connect();
     const getCollection = await this.userModel.find().populate('trips');
     this.db.closeDB();
-    return {
-      data: getCollection,
-      msg: 'All users collection'
-    };
+
+    return getCollection;
   }
 
   //get singleDcoument from collection = this.collection
@@ -25,14 +23,7 @@ class UserService {
     const singleDocument = await this.userModel.findById(userId);
     this.db.closeDB();
 
-    if(!singleDocument) return {
-        error: 'User doest not exist'
-      }
-
-    return {
-      data: singleDocument,
-      msg: `User id: ${userId}`
-    };
+    return singleDocument;
   }
 
   //Creating a user
@@ -49,10 +40,7 @@ class UserService {
     const user = await new this.userModel(data);
     await user.save();
     this.db.closeDB();
-    return {
-      data: user,
-      msg: `User: ${data.name} create`
-    };
+    return user;
   }
 
   //Updating document
@@ -60,10 +48,9 @@ class UserService {
     this.db.connect();
     const updateDocument = await this.userModel.findByIdAndUpdate(userId, data, { new: true });
     this.db.closeDB();
-    return {
-      data: updateDocument,
-      msg: 'User update'
-    };
+
+
+    return updateDocument;
   }
 
   //Deleting one document
@@ -74,14 +61,7 @@ class UserService {
     const deleteTrips = await this.tripModel.deleteMany({ user: userId })
     this.db.closeDB();
 
-    if(!deleteDocument) return {
-      error: 'User doest not exist'
-    }
-
-    return {
-      data: deleteDocument,
-      msg: 'User delete'
-    };
+    return deleteDocument;
   }
 }
 

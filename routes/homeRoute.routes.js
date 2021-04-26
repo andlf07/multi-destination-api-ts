@@ -5,7 +5,7 @@ const router = Router();
 
 router.get('/welcome', ( req, res ) => {
    res.json({
-      hi: "Wlcome to multi-destinaion-api"
+      hi: "Welcome to multi-destinaion-api"
    });
 });
 
