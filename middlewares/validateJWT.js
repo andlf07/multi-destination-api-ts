@@ -9,7 +9,7 @@ const validateJWT = ( req = request, res = response, next ) => {
    //If token is wrong
    if ( !token ) {
       return res.status(401).json({
-         msg: 'Unauthorized please login'
+         error: 'Unauthorized please login'
       })
    }
 
@@ -25,7 +25,7 @@ const validateJWT = ( req = request, res = response, next ) => {
 
    } catch (error) {
       return res.status(401).json({
-         msg: 'Invalid token'
+         error: 'Invalid token'
       })
    }
 
